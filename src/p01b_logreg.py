@@ -27,6 +27,20 @@ class LogisticRegression(LinearModel):
         > clf.predict(x_eval)
     """
 
+    
+    def h_theta(self, x):
+        
+        return 1/(1+ np.exp(np.multiply(np.transpose(self.theta),x)))
+    
+    def J_theta(self,x,y):
+        m = len(y)
+        ansj = 0
+        for a1 in range(m):
+            ansj+= (-1/m)*(y[a1]*np.log(self.h_theta(x[a1]))+(1-y[a1])*np.log(1-self.h_theta(x[a1])))
+            
+        return ansj
+            
+
     def fit(self, x, y):
         """Run Newton's Method to minimize J(theta) for logistic regression.
 
@@ -35,6 +49,7 @@ class LogisticRegression(LinearModel):
             y: Training example labels. Shape (m,).
         """
         # *** START CODE HERE ***
+        
         # *** END CODE HERE ***
 
     def predict(self, x):
