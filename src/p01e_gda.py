@@ -13,8 +13,12 @@ def main():
         pred_path: Path to save predictions.
     """
     # Load dataset
-    x_train, y_train = util.load_dataset("../data/ds2_train.csv", add_intercept=False)
-    x_valid, y_valid = util.load_dataset("../data/ds2_valid.csv", add_intercept=False)
+    x_train, y_train = util.load_dataset("../data/ds1_train.csv", add_intercept=False)
+    x_valid, y_valid = util.load_dataset("../data/ds1_valid.csv", add_intercept=False)
+    for i in range(np.shape(x_train)[0]):
+        x_train[i][1] = np.log(x_train[i][1])
+    for i in range(np.shape(x_valid)[0]):
+        x_valid[i][1] = np.log(x_valid[i][1])
     model = GDA()
     model.fit(x_train,y_train)
     pred = model.predict(x_valid)
@@ -109,7 +113,7 @@ class GDA(LinearModel):
         self.thetazero = np.dot(np.dot(self.musal[0].T,sigmainv),self.musal[1]) - np.dot(np.dot(self.musal[1].T,sigmainv),self.musal[0])-np.log((1-self.phi)/self.phi)
         y = np.zeros((np.shape(x)[0],1))
         for i in range(np.shape(x)[0]):
-            y[i][0] = 1/(1+np.exp(-(np.dot(self.theta.T,np.array([x[i]]).T)+self.thetazero)))
+            y[i][0] =  int(1/(1+np.exp(-(np.dot(self.theta.T,np.array([x[i]]).T)+self.thetazero)))>0.5)
             
         return y
     
