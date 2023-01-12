@@ -15,11 +15,12 @@ def main():
     """
     # Load training set
     x_train, y_train = util.load_dataset("../data/ds4_train.csv", add_intercept=True)
-    poimodel = PoissonRegression(theta_0=np.array([[0],[0],[0],[0],[0]]))
+    poimodel = PoissonRegression(theta_0=np.array([[0],[0],[0],[0],[0]]),max_iter=100000,step_size=0.000000001)
     poimodel.fit(x_train,y_train)
     x_valid, y_valid = util.load_dataset("../data/ds4_valid.csv",add_intercept=True)
     pred = poimodel.predict(x_valid)
-    util.plot(np.array(pred),y_valid,np.array([0,1,1]))
+    print(pred)
+    print(y_valid)
 
     # *** START CODE HERE ***
     # Fit a Poisson Regression model
@@ -37,19 +38,9 @@ class PoissonRegression(LinearModel):
     """
     
     
-    def next(self,x,y):
-        l = self.make_list(x,y)
-        addtheta = np.zeros((np.shape(x)[1],1))
-        for j in range(np.shape(x)[1]):
-            for i in range(np.shape(x)[0]):
-                print(l[i],x[i][j])
-                addtheta[j]+=((l[i])*x[i][j])
-        self.theta = self.theta+self.step_size*addtheta
-        
-    
-    
-        
-
+    def next(self,x,y,num):
+        # print(np.exp(float(np.dot(self.theta.T,np.array([x[num]]).T))))
+        self.theta = self.theta+self.step_size*(y[num]-np.exp(float(np.dot(self.theta.T,np.array([x[num]]).T))))*np.array([x[num]]).T
     def fit(self, x, y):
         """Run gradient ascent to maximize likelihood for Poisson regression.
 
@@ -58,10 +49,13 @@ class PoissonRegression(LinearModel):
             y: Training example labels. Shape (m,).
         """
         # *** START CODE HERE ***
-        prevtheta = self.theta
         count = 0
+        num = 0
         while count<self.max_iter:
-            self.next(x,y)
+            self.next(x,y,num)
+            num+=1
+            num%=np.shape(x)[0]
+            count+=1
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -75,8 +69,8 @@ class PoissonRegression(LinearModel):
         """
         # *** START CODE HERE ***
         pred = []
-        for i in x:
-            pred.append(np.exp(np.dot(self.theta.T,np.array([i]).T)))
+        for i in range(np.shape(x)[0]):
+            pred.append(np.exp(float(np.dot(self.theta.T,np.array([x[i]]).T))))
             
         return pred
         # *** END CODE HERE ***
