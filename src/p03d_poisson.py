@@ -4,7 +4,7 @@ from scipy.stats import poisson
 from linear_model import LinearModel
 
 
-def main(lr, train_path, eval_path, pred_path):
+def main():
     """Problem 3(d): Poisson regression with gradient ascent.
 
     Args:
@@ -14,11 +14,11 @@ def main(lr, train_path, eval_path, pred_path):
         pred_path: Path to save predictions.
     """
     # Load training set
-    x_train, y_train = util.load_dataset("../data/ds4_train.csv", add_intercept=False)
-    poimodel = PoissonRegression(theta_0=[[0],[0],[0],[0],[0]])
-    PoissonRegression.fit(x_train,y_train)
+    x_train, y_train = util.load_dataset("../data/ds4_train.csv", add_intercept=True)
+    poimodel = PoissonRegression(theta_0=np.array([[0],[0],[0],[0],[0]]))
+    poimodel.fit(x_train,y_train)
     x_valid, y_valid = util.load_dataset("../data/ds4_valid.csv",add_intercept=True)
-    pred = PoissonRegression.predict(x_valid)
+    pred = poimodel.predict(x_valid)
     util.plot(np.array(pred),y_valid,np.array([0,1,1]))
 
     # *** START CODE HERE ***
@@ -36,18 +36,13 @@ class PoissonRegression(LinearModel):
         > clf.predict(x_eval)
     """
     
-    def make_list(self,x,y):
-        l = []
-        for i in range(np.size(y)):
-            poi = poisson.pmf(k=y[i],mu = np.exp(2*np.dot(self.theta.T,np.array([x[i]]).T)))
-            l.append((-1*y[i]+ np.exp((np.dot(self.theta.T,np.array([x[i]]).T))))/poi)
-        return l
     
     def next(self,x,y):
         l = self.make_list(x,y)
-        addtheta = np.zeros((np.size(x)[1],1))
-        for j in range(np.size(x)[1]):
-            for i in range(np.size(x)[0]):
+        addtheta = np.zeros((np.shape(x)[1],1))
+        for j in range(np.shape(x)[1]):
+            for i in range(np.shape(x)[0]):
+                print(l[i],x[i][j])
                 addtheta[j]+=((l[i])*x[i][j])
         self.theta = self.theta+self.step_size*addtheta
         
@@ -66,7 +61,7 @@ class PoissonRegression(LinearModel):
         prevtheta = self.theta
         count = 0
         while count<self.max_iter:
-            next(x,y)
+            self.next(x,y)
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -85,3 +80,5 @@ class PoissonRegression(LinearModel):
             
         return pred
         # *** END CODE HERE ***
+
+main()
