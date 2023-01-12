@@ -2,6 +2,7 @@ import numpy as np
 import util
 from scipy.stats import poisson
 from linear_model import LinearModel
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -19,8 +20,13 @@ def main():
     poimodel.fit(x_train,y_train)
     x_valid, y_valid = util.load_dataset("../data/ds4_valid.csv",add_intercept=True)
     pred = poimodel.predict(x_valid)
-    print(pred)
-    print(y_valid)
+    x_line = np.linspace(1e6,1e7,10)
+    y_line = 1*x_line
+    plt.plot(x_line,y_line)
+    plt.scatter(pred,y_valid,color='red')
+    plt.xlim(1e6, 1e7)
+    plt.ylim(1e6, 1e7)
+    plt.show()
 
     # *** START CODE HERE ***
     # Fit a Poisson Regression model
