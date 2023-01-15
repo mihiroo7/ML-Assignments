@@ -23,7 +23,7 @@ def main(tau, train_path, eval_path):
     x_train = x_train.flatten()
     x_valid = np.delete(x_valid,0,1)
     x_valid = x_valid.flatten()
-    # print(((pred - y_valid)**2).mean())
+    print(((pred - y_valid)**2).mean())
     plt.scatter(x_train,y_train,color='red')
     plt.scatter(x_valid,pred,color='blue')
     plt.xlim(-2, 2)
