@@ -26,7 +26,7 @@ def main(tau, train_path, eval_path):
     print(((pred - y_valid)**2).mean())
     plt.scatter(x_train,y_train,color='red')
     plt.scatter(x_valid,pred,color='blue')
-    plt.xlim(-2, 2)
+    plt.xlim(-5, 5)
     plt.ylim(-2, 2)
     plt.show()
  
@@ -99,4 +99,4 @@ class LocallyWeightedLinearRegression(LinearModel):
         return pred
         # *** END CODE HERE ***
 
-main(0.5, "../data/ds5_train.csv","../data/ds5_test.csv")
+main(0.1, "../data/ds5_train.csv","../data/ds5_test.csv")
