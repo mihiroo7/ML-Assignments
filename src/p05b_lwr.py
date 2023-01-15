@@ -99,4 +99,4 @@ class LocallyWeightedLinearRegression(LinearModel):
         return pred
         # *** END CODE HERE ***
 
-main(0.1, "../data/ds5_train.csv","../data/ds5_test.csv")
+main(0.1, "../data/ds5_train.csv","../data/ds5_valid.csv")
