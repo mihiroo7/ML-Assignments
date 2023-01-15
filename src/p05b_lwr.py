@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import util
-
 from linear_model import LinearModel
 
 
@@ -15,6 +14,22 @@ def main(tau, train_path, eval_path):
     """
     # Load training set
     x_train, y_train = util.load_dataset(train_path, add_intercept=True)
+    model = LocallyWeightedLinearRegression(tau= tau)
+    model.fit(x_train,y_train)
+    x_valid, y_valid = util.load_dataset(eval_path, add_intercept=True)
+    pred = model.predict(x_valid)
+    
+    x_train = np.delete(x_train,0,1)
+    x_train = x_train.flatten()
+    x_valid = np.delete(x_valid,0,1)
+    x_valid = x_valid.flatten()
+    print(((pred - y_valid)**2).mean())
+    plt.scatter(x_train,y_train,color='red')
+    plt.scatter(x_valid,pred,color='blue')
+    plt.xlim(-5, 5)
+    plt.ylim(-2, 2)
+    plt.show()
+ 
 
     # *** START CODE HERE ***
     # Fit a LWR model
@@ -45,6 +60,11 @@ class LocallyWeightedLinearRegression(LinearModel):
 
         """
         # *** START CODE HERE ***
+        self.theta = np.zeros((np.shape(x)[1],1))
+        self.x = x
+        self.y = y
+            
+
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -57,4 +77,26 @@ class LocallyWeightedLinearRegression(LinearModel):
             Outputs of shape (m,).
         """
         # *** START CODE HERE ***
+        Y = np.array([self.y])
+        Y = Y.T  
+        n = np.shape(x)[0]
+        X = self.x
+        pred = []
+        for i in range(n):
+            w = []
+            for j in range(np.shape(self.x)[0]):
+                l = []
+                for k in range(np.shape(self.x)[0]):
+                    if j==k: l.append(np.exp(-1*(np.linalg.norm(x[i]- X[k]))/(2*self.tau**2)))
+                    else : l.append(0)
+                w.append(l)
+            
+            w = np.array(w)
+            self.theta = 0.5*np.dot(np.linalg.inv(np.dot(X.T,np.dot(w,X))),np.dot(Y.T,np.dot(w,X)).T+np.dot(X.T,np.dot(w,Y)))
+    
+            pred.append(float(np.dot(self.theta.T,np.array([x[i]]).T)))
+            
+        return pred
         # *** END CODE HERE ***
+
+main(0.1, "../data/ds5_train.csv","../data/ds5_test.csv")
